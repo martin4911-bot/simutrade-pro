@@ -1,0 +1,253 @@
+<div id="simu">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box}
+#simu{font-family:Inter,Arial,sans-serif;background:#080d14;color:#e7edf5;min-height:100vh;padding:16px}
+#simu button,#simu select{font:inherit;cursor:pointer}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #202b39;padding:10px 0 18px;flex-wrap:wrap}
+.brand{font-size:20px;font-weight:800;letter-spacing:-1px}
+.brand span{color:#4adea5}
+.tag{color:#8ea0b6;font-size:11px;border:1px solid #293547;border-radius:20px;padding:5px 9px}
+.nav{display:flex;gap:6px;flex-wrap:wrap}
+.nav button{background:transparent;border:0;color:#8b9bb0;padding:9px 12px;border-radius:8px}
+.nav button.active,.nav button:hover{background:#172331;color:#eaf3ff}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;margin-top:16px}
+.card{background:#0e1621;border:1px solid #202d3b;border-radius:13px;padding:15px}
+.card h3{font-size:13px;color:#9eafc2;margin:0 0 14px}
+.assethead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.assetname{font-size:20px;font-weight:700}
+.price{font-size:28px;font-weight:800;margin-top:8px}
+.green{color:#45d5a0}.red{color:#ff6f7f}
+.small{font-size:12px;color:#8ea0b6}
+.tools{display:flex;gap:5px;flex-wrap:wrap;margin:14px 0}
+.tools button{background:#162331;color:#9eb1c5;border:1px solid #263646;border-radius:6px;padding:7px 10px;font-size:11px}
+.tools button.selected{background:#183c35;border-color:#286c58;color:#5ee6b3}
+canvas{width:100%;height:330px;display:block}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}
+.stat{background:#111d2a;padding:11px;border-radius:9px}
+.stat small{color:#8497ad;font-size:10px}
+.stat strong{display:block;margin-top:5px;font-size:14px}
+.watchrow{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1d2a38;padding:12px 0;font-size:12px}
+.watchrow:last-child{border-bottom:0}
+.watchrow button{border:0;background:none;color:#dfe9f3;text-align:left}
+.watchrow .change{font-size:11px}
+.tradebox{margin-top:14px}
+.tradebox input,.tradebox select{width:100%;background:#0a111a;color:#e7edf5;border:1px solid #263647;border-radius:7px;padding:10px;margin:6px 0}
+.tradebuttons{display:flex;gap:8px;margin-top:10px}
+.tradebuttons button{flex:1;border:0;border-radius:8px;padding:11px;color:#06130e;font-weight:700}
+.buy{background:#43d39b}.sell{background:#ff7180}
+.portfolio{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table td,.table th{padding:10px;border-bottom:1px solid #202b38;text-align:left}
+.table th{color:#8296ac;font-weight:500}
+.note{font-size:10px;color:#71839a;line-height:1.6;margin-top:15px}
+.hidden{display:none!important}
+@media(max-width:800px){#simu{padding:10px}.layout{grid-template-columns:1fr}.portfolio{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}canvas{height:270px}}
+</style>
+
+<div class="top">
+  <div>
+    <div class="brand">SIMU<span>TRADE</span> PRO</div>
+    <div class="small">Virtual markets · Learning terminal</div>
+  </div>
+  <span class="tag">● SIMULATION MODE</span>
+  <div class="nav">
+    <button class="active" onclick="tab('dashboard',this)">Dashboard</button>
+    <button onclick="tab('portfolio',this)">Portfolio</button>
+    <button onclick="tab('history',this)">History</button>
+  </div>
+</div>
+
+<div id="dashboard">
+<div class="layout">
+<main>
+<div class="card">
+<div class="assethead">
+<div>
+<div class="assetname" id="assetTitle">Bitcoin · BTC/USD</div>
+<div class="small">SIMULATED MARKET</div>
+</div>
+<select id="asset" onchange="changeAsset()" style="background:#13202d;color:white;border:1px solid #2a3a4c;padding:9px;border-radius:7px">
+<option value="BTC">Bitcoin BTC</option>
+<option value="ETH">Ethereum ETH</option>
+<option value="SOL">Solana SOL</option>
+<option value="NVDA">NVIDIA NVDA</option>
+<option value="AAPL">Apple AAPL</option>
+<option value="TSLA">Tesla TSLA</option>
+<option value="GOLD">Gold XAU</option>
+<option value="EUR">EUR/USD</option>
+</select>
+</div>
+<div class="price" id="price">$67,250.00</div>
+<div class="green" id="change">+2.45% today</div>
+<div class="tools">
+<button class="selected" onclick="period(30,this)">1D</button>
+<button onclick="period(60,this)">1W</button>
+<button onclick="period(90,this)">1M</button>
+<button onclick="period(120,this)">3M</button>
+<button onclick="period(150,this)">1Y</button>
+<button onclick="period(180,this)">ALL</button>
+</div>
+<canvas id="chart"></canvas>
+<div class="stats">
+<div class="stat"><small>24H HIGH</small><strong id="high">$68,420</strong></div>
+<div class="stat"><small>24H LOW</small><strong id="low">$65,870</strong></div>
+<div class="stat"><small>VOLUME</small><strong id="volume">$2.41B</strong></div>
+<div class="stat"><small>RSI (14)</small><strong id="rsi">56.8</strong></div>
+</div>
+</div>
+
+<div class="card" style="margin-top:14px">
+<h3>Market overview</h3>
+<table class="table">
+<thead><tr><th>Asset</th><th>Price</th><th>24H</th></tr></thead>
+<tbody id="marketTable"></tbody>
+</table>
+</div>
+</main>
+
+<aside>
+<div class="card">
+<h3>Watchlist</h3>
+<div id="watchlist"></div>
+</div>
+<div class="card tradebox">
+<h3>Paper trading · Order ticket</h3>
+<div class="small">Available cash</div>
+<strong id="cash">$100,000.00</strong>
+<select id="tradeAsset">
+<option>BTC</option><option>ETH</option><option>SOL</option><option>NVDA</option><option>AAPL</option><option>TSLA</option><option>GOLD</option><option>EUR</option>
+</select>
+<input id="qty" type="number" min="0" step="0.01" placeholder="Quantity">
+<div class="small" id="orderValue">Estimated order: $0.00</div>
+<div class="tradebuttons">
+<button class="buy" onclick="trade('buy')">BUY</button>
+<button class="sell" onclick="trade('sell')">SELL</button>
+</div>
+<div class="note">Orders are simulated. No real money, brokerage, or real market execution.</div>
+</div>
+</aside>
+</div>
+</div>
+
+<div id="portfolio" class="hidden">
+<div class="portfolio">
+<div class="card"><h3>Account value</h3><div class="price" id="accountValue">$100,000</div></div>
+<div class="card"><h3>Cash available</h3><div class="price" id="portfolioCash">$100,000</div></div>
+<div class="card"><h3>Virtual P/L</h3><div class="price green" id="pl">$0.00</div></div>
+</div>
+<div class="card" style="margin-top:14px"><h3>Positions</h3><table class="table"><thead><tr><th>Asset</th><th>Quantity</th><th>Avg. price</th><th>Value</th><th>P/L</th></tr></thead><tbody id="positions"></tbody></table></div>
+</div>
+
+<div id="history" class="hidden">
+<div class="card"><h3>Trade history</h3><table class="table"><thead><tr><th>Date</th><th>Side</th><th>Asset</th><th>Quantity</th><th>Price</th><th>Total</th></tr></thead><tbody id="historyRows"></tbody></table></div>
+</div>
+
+<script>
+const names={BTC:"Bitcoin",ETH:"Ethereum",SOL:"Solana",NVDA:"NVIDIA",AAPL:"Apple",TSLA:"Tesla",GOLD:"Gold",EUR:"EUR/USD"};
+const initial={BTC:67250,ETH:3480,SOL:182,NVDA:142,AAPL:235,TSLA:340,GOLD:2680,EUR:1.08};
+let prices={...initial},cash=100000,positions={},history=[];
+let active="BTC",chartPoints=[],chartLength=30;
+const $=id=>document.getElementById(id);
+function money(v){return "$"+Number(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function pct(v){return (v>=0?"+":"")+v.toFixed(2)+"%"}
+function tab(name,btn){
+ ["dashboard","portfolio","history"].forEach(x=>$(x).classList.toggle("hidden",x!==name));
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+ if(name==="portfolio")renderPortfolio();
+ if(name==="history")renderHistory();
+}
+function changeAsset(){
+ active=$("asset").value;
+ $("tradeAsset").value=active;
+ $("assetTitle").textContent=names[active]+" · "+active+"/USD";
+ makePoints();render();
+}
+function period(n,b){chartLength=n;document.querySelectorAll(".tools button").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");makePoints();drawChart()}
+function makePoints(){
+ let base=prices[active],p=base*(1-chartLength/5000);
+ chartPoints=[];
+ for(let i=0;i<85;i++){p*=1+(Math.random()-.48)*.012;chartPoints.push(p)}
+ chartPoints[84]=base;
+}
+function drawChart(){
+ let c=$("chart"),ctx=c.getContext("2d");
+ let rect=c.getBoundingClientRect();c.width=rect.width*devicePixelRatio;c.height=rect.height*devicePixelRatio;
+ ctx.scale(devicePixelRatio,devicePixelRatio);
+ let w=rect.width,h=rect.height,pts=chartPoints;
+ let min=Math.min(...pts)*.995,max=Math.max(...pts)*1.005;
+ let y=v=>h-((v-min)/(max-min))*h;
+ ctx.font="10px Inter";ctx.strokeStyle="#1b2836";ctx.fillStyle="#8294a9";
+ for(let i=0;i<5;i++){let yy=h*i/4;ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(w,yy);ctx.stroke();ctx.fillText((max-(max-min)*i/4).toFixed(2),5,yy+12)}
+ let up=pts.at(-1)>=pts[0],col=up?"#42d5a0":"#ff7081";
+ ctx.beginPath();ctx.moveTo(0,y(pts[0]));
+ pts.forEach((v,i)=>ctx.lineTo(i*w/(pts.length-1),y(v)));
+ ctx.strokeStyle=col;ctx.lineWidth=2;ctx.stroke();
+ ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();
+ let grad=ctx.createLinearGradient(0,0,0,h);grad.addColorStop(0,up?"rgba(66,213,160,.2)":"rgba(255,112,129,.2)");grad.addColorStop(1,"rgba(8,13,20,0)");
+ ctx.fillStyle=grad;ctx.fill();
+ ctx.beginPath();pts.forEach((v,i)=>i?ctx.lineTo(i*w/(pts.length-1),y(v)):ctx.moveTo(0,y(v)));ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fill();
+}
+function render(){
+ let p=prices[active],variation=(Math.random()*4-2);
+ $("price").textContent=money(p);
+ $("change").textContent=pct(variation)+" today";
+ $("change").className=variation>=0?"green":"red";
+ $("high").textContent=money(p*1.025);$("low").textContent=money(p*.975);
+ $("volume").textContent="$"+(Math.random()*4+1).toFixed(2)+"B";
+ $("rsi").textContent=(Math.random()*35+35).toFixed(1);
+ $("cash").textContent=money(cash);
+ $("marketTable").innerHTML=Object.keys(prices).map(a=>`<tr><td>${names[a]}</td><td>${money(prices[a])}</td><td class="${Math.random()>.5?'green':'red'}">${pct((Math.random()*5)-2.5)}</td></tr>`).join("");
+ $("watchlist").innerHTML=Object.keys(prices).map(a=>`<div class="watchrow"><button onclick="selectWatch('${a}')"><b>${a}</b><br><span class="small">${names[a]}</span></button><div style="text-align:right">${money(prices[a])}<div class="change ${Math.random()>.5?'green':'red'}">${pct(Math.random()*4-2)}</div></div></div>`).join("");
+ makePoints();drawChart();
+}
+function selectWatch(a){$("asset").value=a;$("tradeAsset").value=a;changeAsset()}
+function trade(side){
+ let a=$("tradeAsset").value,q=Number($("qty").value),p=prices[a],total=q*p;
+ if(!q||q<=0){alert("Enter a valid quantity.");return}
+ if(side==="buy"){
+  if(total>cash){alert("Insufficient virtual cash.");return}
+  cash-=total;
+  let old=positions[a]||{qty:0,cost:0};
+  old.qty+=q;old.cost+=total;positions[a]=old;
+ }else{
+  if(!positions[a]||positions[a].qty<q){alert("Not enough virtual shares/coins to sell.");return}
+  positions[a].qty-=q;
+  cash+=total;
+ }
+ history.unshift({date:new Date().toLocaleString(),side,a,q,p,total});
+ $("qty").value="";
+ renderPortfolio();renderHistory();render();
+ alert(side.toUpperCase()+" simulated successfully!");
+}
+function renderPortfolio(){
+ let total=cash,invested=0,profit=0;
+ let rows=Object.entries(positions).filter(([a,pos])=>pos.qty>0).map(([a,pos])=>{
+ let val=pos.qty*prices[a],avg=pos.cost/pos.qty,pl=val-pos.cost;
+ total+=val;invested+=pos.cost;profit+=pl;
+ return `<tr><td>${a}</td><td>${pos.qty.toFixed(4)}</td><td>${money(avg)}</td><td>${money(val)}</td><td class="${pl>=0?'green':'red'}">${money(pl)}</td></tr>`
+ });
+ $("positions").innerHTML=rows.join("")||"<tr><td colspan='5'>No positions yet. Try a virtual trade.</td></tr>";
+ $("accountValue").textContent=money(total);$("portfolioCash").textContent=money(cash);
+ $("pl").textContent=money(profit);$("pl").className="price "+(profit>=0?"green":"red");
+}
+function renderHistory(){
+ $("historyRows").innerHTML=history.map(t=>`<tr><td>${t.date}</td><td class="${t.side==='buy'?'green':'red'}">${t.side.toUpperCase()}</td><td>${t.a}</td><td>${t.q}</td><td>${money(t.p)}</td><td>${money(t.total)}</td></tr>`).join("")||"<tr><td colspan='6'>No trades yet.</td></tr>";
+}
+function selectTab(name){document.querySelector(`.nav button[onclick*="${name}"]`).click()}
+function renderPortfolio(){renderPortfolioInner()}
+function renderPortfolioInner(){renderPortfolioData()}
+function renderPortfolioData(){
+ let total=cash,profit=0;
+ Object.entries(positions).forEach(([a,pos])=>{if(pos.qty>0){total+=pos.qty*prices[a];profit+=pos.qty*prices[a]-pos.cost}});
+ $("accountValue").textContent=money(total);$("portfolioCash").textContent=money(cash);
+ $("pl").textContent=money(profit);$("pl").className="price "+(profit>=0?"green":"red");
+}
+$("qty").addEventListener("input",()=>{$("orderValue").textContent="Estimated order: "+money(Number($("qty").value||0)*prices[$("tradeAsset").value])});
+$("tradeAsset").addEventListener("change",()=>{$("orderValue").textContent="Estimated order: "+money(Number($("qty").value||0)*prices[$("tradeAsset").value])});
+window.addEventListener("resize",drawChart);
+makePoints();render();
+setInterval(()=>{Object.keys(prices).forEach(a=>prices[a]*=1+(Math.random()-.5)*.001);renderPortfolioData();render()},5000);
+</script>
+</div>
